@@ -1,0 +1,21 @@
+server:
+  servlet:
+    context-path: /diamond
+spring:
+  application:
+    name: DiamondStore
+  datasource:
+    url: "jdbc:mysql://localhost:3306/diamondstore"
+    username: root
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: update
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+cloudinary:
+  name: dwo6awlac
+  apiKey: 223931344624886
+  apiSecret: hlyIccet1luz2JMf6-mFlZYbm44
