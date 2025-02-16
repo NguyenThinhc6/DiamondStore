@@ -1,5 +1,6 @@
 package com.diamond.store.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,7 +26,7 @@ public class Sale {
     private double value;
     private Date timeStart;
     private Date timeEnd;
-    private boolean status; //Enable and disable sale holiday
+    private boolean enable; //Enable and disable sale holiday
 
     @ManyToMany
     @JoinTable(
@@ -33,5 +34,6 @@ public class Sale {
             joinColumns = @JoinColumn(name = "sale_id"),
             inverseJoinColumns = @JoinColumn(name = "product_id")
     )
+    @JsonIgnore
     private List<Product> products;
 }
