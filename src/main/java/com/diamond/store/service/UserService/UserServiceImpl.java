@@ -10,14 +10,17 @@ import com.diamond.store.exception.ResourceNotFoundException;
 import com.diamond.store.model.Account;
 import com.diamond.store.model.Image;
 import com.diamond.store.model.Profile;
+import com.diamond.store.model.Role;
 import com.diamond.store.repository.AccountRepository;
 import com.diamond.store.repository.ImageRepository;
 import com.diamond.store.repository.ProfileRepository;
+import com.diamond.store.repository.RoleRepository;
 import com.diamond.store.service.UploadService.UploadService;
 import com.diamond.store.util.ApplicationMessage;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,7 +34,10 @@ public class UserServiceImpl implements UserService {
     private final AccountRepository accountRepository;
     private final ProfileRepository profileRepository;
     private final ImageRepository imageRepository;
+    private final RoleRepository roleRepository;
     private final UploadService uploadService;
+    private final PasswordEncoder passwordEncoder;
+
 
     @Transactional
     @Override
@@ -42,9 +48,13 @@ public class UserServiceImpl implements UserService {
                 .ifPresentOrElse(account -> {
                     throw new ResourceConflictException(ApplicationMessage.USER_CONFLICT);
                 }, () -> {
+                    Role role = roleRepository.findByRoleName(userRequest.getRoleName()).orElseThrow(() -> new ResourceNotFoundException(ApplicationMessage.ROLE_NOTFOUND));
+
+
                     Account newAccount = Account.builder()
                             .username(userRequest.getUsername())
-                            .password(userRequest.getPassword())
+                            .password(passwordEncoder.encode(userRequest.getPassword()))
+                            .role(role)
                             .build();
                     accountRepository.save(newAccount);//vì có transaction nên lưu trước để nó quản lý
 
@@ -100,6 +110,8 @@ public class UserServiceImpl implements UserService {
         accountRepository.findById(userId)
                 .ifPresentOrElse(account -> {
                     accountRepository.delete(account);
+                    imageRepository.findById(account.getProfile().getProfileImage().getImageId()).ifPresent(imageRepository::delete);
+                    uploadService.deleteFile(account.getProfile().getProfileImage().getImageId());
                     log.info("Delete user success");
                 }, () -> {
                     throw new ResourceNotFoundException(ApplicationMessage.USER_NOTFOUND);
@@ -151,22 +163,6 @@ public class UserServiceImpl implements UserService {
 
 
                     FileResponse fileUpload = uploadService.uploadAvatar(fileRequest);
-//                    if(imageRepository.findById(fileRequest.getOwnerId()).isPresent()) {
-//                        Image imageToUpdate = imageRepository.findById(fileRequest.getOwnerId()).get();
-//                        imageToUpdate.setImageUrl(fileUpload.getUrl());
-//                        imageToUpdate.setTag(String.join(",", fileRequest.getTags()));
-//                        // Bạn có thể cập nhật các trường khác nếu cần
-//
-//                        imageRepository.save(imageToUpdate);
-//                    }
-//
-//                    Image image = Image.builder()
-//                            .imageId(fileUpload.getFileId())
-//                            .imageUrl(fileUpload.getUrl())
-//                            .tag(String.join(",", fileRequest.getTags()))
-//                            .build();
-//
-//                    p.setProfileImage(image);
 
                     imageRepository.findById(fileRequest.getOwnerId())
                             .ifPresentOrElse(existingImage -> {
@@ -189,4 +185,6 @@ public class UserServiceImpl implements UserService {
                 }
         );
     }
+
+
 }

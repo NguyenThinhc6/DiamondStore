@@ -10,6 +10,12 @@ public class ApplicationMessage {
     public static final String USER_CONFLICT = "User is existed!";
 
     public static final String UPLOAD_FAILED = "Upload file failed!";
+    public static final String DELETE_FILE_FAILED = "Delete file failed!";
+
+    //Generic message
+    public static final String DATA_NOTFOUND = "Data is not found!";
+
+
 
     //Response api message
     public static final String GET_DATA_SUCCESS = "Get data success!";
@@ -17,6 +23,7 @@ public class ApplicationMessage {
     public static final String DELETE_DATA_SUCCESS = "Delete data success!";
     public static final String UPDATE_DATA_SUCCESS = "Update data success!";
     public static final String UPLOAD_FILE_SUCCESS = "Upload file success!";
+//    public static final String DELETE_FILE_SUCCESS = "Upload file success!";
 
 
 }

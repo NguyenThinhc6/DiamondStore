@@ -9,7 +9,6 @@ import com.diamond.store.util.ApplicationMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.text.Normalizer;
@@ -25,7 +24,7 @@ public class UploadServiceImpl implements UploadService {
 
     @Override
     public FileResponse uploadAvatar(FileRequest fileRequest) {
-        log.info("Uploading file : {} ", fileRequest.getFile().getOriginalFilename() );
+        log.info("Uploading file : {} ", fileRequest.getFile().getOriginalFilename());
 
         try {
 
@@ -34,7 +33,7 @@ public class UploadServiceImpl implements UploadService {
             uploadParams.put("public_id", fileRequest.getOwnerId());
             uploadParams.put("tags", String.join(",", fileRequest.getTags()));
 
-            Map uploadResult =     upload(fileRequest.getFile().getBytes(),uploadParams);
+            Map uploadResult = upload(fileRequest.getFile().getBytes(), uploadParams);
             FileResponse fileResponse = new FileResponse();
             fileResponse.setFileId(fileRequest.getOwnerId());
             fileResponse.setUrl(uploadResult.get("url").toString());
@@ -46,9 +45,21 @@ public class UploadServiceImpl implements UploadService {
 
     }
 
+    @Override
+    public void deleteFile(String fileId) {
+        try {
+            if (isPublicIdExists(fileId)) {
+                cloudinary.uploader().destroy(fileId, ObjectUtils.emptyMap());
+            }
 
-    private Map upload(byte[] file, Map<String, Object>  uploadParams) throws IOException {
-        return cloudinary.uploader().upload(file,uploadParams);
+        } catch (IOException e) {
+            throw new InternalServerErrorException(ApplicationMessage.DELETE_FILE_FAILED);
+        }
+    }
+
+
+    private Map upload(byte[] file, Map<String, Object> uploadParams) throws IOException {
+        return cloudinary.uploader().upload(file, uploadParams);
     }
 
 

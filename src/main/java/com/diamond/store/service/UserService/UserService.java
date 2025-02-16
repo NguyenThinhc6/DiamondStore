@@ -3,13 +3,13 @@ package com.diamond.store.service.UserService;
 import com.diamond.store.dto.request.FileRequest;
 import com.diamond.store.dto.request.UserRequest;
 import com.diamond.store.dto.response.UserResponse;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface UserService {
     //User là account + profile
     void addUser(UserRequest userRequest);
+
     //User id là account id or profile id
     void updateUser(String userId, UserRequest userRequest);
 
@@ -24,5 +24,8 @@ public interface UserService {
     UserResponse getUserByUsername(String username);
 
     void uploadAvatar(FileRequest fileRequest);
+
+    /// Client method
+
 
 }
