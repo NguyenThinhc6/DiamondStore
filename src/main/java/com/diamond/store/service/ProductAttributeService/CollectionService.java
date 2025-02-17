@@ -27,4 +27,16 @@ public class CollectionService extends ProductAttributeServiceImpl<Collection, I
                 }
         );
     }
+
+    public Collection findOrCreateByName(String name) {
+
+        return collectionRepository.findByCollectionName(name)
+                .orElseGet(() -> {
+                    Collection newCollection = Collection.builder()
+                            .collectionName(name)
+                            .build();
+                    return collectionRepository.save(newCollection);
+                });
+
+    }
 }

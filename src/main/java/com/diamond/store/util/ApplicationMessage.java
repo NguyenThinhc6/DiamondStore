@@ -9,6 +9,9 @@ public class ApplicationMessage {
     public static final String USER_NOTFOUND = "User is not found!";
     public static final String USER_CONFLICT = "User is existed!";
 
+    public static final String PRODUCT_NOTFOUND = "Product is not found!";
+    public static final String PRODUCT_CONFLICT = "Product is existed!";
+
     public static final String UPLOAD_FAILED = "Upload file failed!";
     public static final String DELETE_FILE_FAILED = "Delete file failed!";
 

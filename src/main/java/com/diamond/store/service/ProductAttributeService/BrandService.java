@@ -25,4 +25,16 @@ public class BrandService extends ProductAttributeServiceImpl<Brand, Integer> {
                 }
         );
     }
+
+    public Brand findOrCreateByName(String name) {
+
+        return brandRepository.findByBrandName(name)
+                .orElseGet(() -> {
+                    Brand newBrand = Brand.builder()
+                            .brandName(name)
+                            .build();
+                    return brandRepository.save(newBrand);
+                });
+
+    }
 }

@@ -8,10 +8,9 @@ public interface ProductAttributeService<T, Id> {
 
     T findById(Id id);
 
-    void create (T model);
+    void create(T model);
 
-    void update (T model, Id id);
+    void update(T model, Id id);
 
-    void delete (Id id  );
-
+    void delete(Id id);
 }

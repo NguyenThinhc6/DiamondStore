@@ -26,4 +26,16 @@ public class CategoryService extends ProductAttributeServiceImpl<Category, Integ
                 }
         );
     }
+
+    public Category findOrCreateByName(String name) {
+
+        return categoryRepository.findByCategoryName(name)
+                .orElseGet(() -> {
+                    Category newCategory = Category.builder()
+                            .categoryName(name)
+                            .build();
+                    return categoryRepository.save(newCategory);
+                });
+
+    }
 }
