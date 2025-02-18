@@ -1,6 +1,5 @@
 package com.diamond.store.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -34,6 +33,11 @@ public class Sale {
             joinColumns = @JoinColumn(name = "sale_id"),
             inverseJoinColumns = @JoinColumn(name = "product_id")
     )
-    @JsonIgnore
     private List<Product> products;
+
+
+    public void addProduct(Product product) {
+        this.products.add(product);
+        product.getOnSales().add(this);
+    }
 }

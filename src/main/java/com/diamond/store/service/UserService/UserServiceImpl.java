@@ -7,10 +7,7 @@ import com.diamond.store.dto.response.FileResponse;
 import com.diamond.store.dto.response.UserResponse;
 import com.diamond.store.exception.ResourceConflictException;
 import com.diamond.store.exception.ResourceNotFoundException;
-import com.diamond.store.model.Account;
-import com.diamond.store.model.Image;
-import com.diamond.store.model.Profile;
-import com.diamond.store.model.Role;
+import com.diamond.store.model.*;
 import com.diamond.store.repository.AccountRepository;
 import com.diamond.store.repository.ImageRepository;
 import com.diamond.store.repository.ProfileRepository;
@@ -67,7 +64,11 @@ public class UserServiceImpl implements UserService {
                             .build();
 
                     newAccount.setProfile(newProfile);//khi set profile thì account có sự thay đổi nên đc transaction nó đánh dấu và cập nhật sau kkhi kêt thúc
+                    Cart cart = Cart.builder()
+                            .user(newAccount)
+                            .build();
 
+                    newAccount.setCart(cart);
                     log.info("Create user success!");
                 });
     }

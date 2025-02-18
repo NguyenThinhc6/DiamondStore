@@ -1,9 +1,11 @@
 package com.diamond.store.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -36,10 +38,16 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<Size> sizes;
     @OneToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "product_images",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "image_id")
+    )
     private List<Image> images;
-    @OneToMany(mappedBy = "product",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<Review> reviews;
 
     @ManyToMany(mappedBy = "products")
+    @JsonIgnore
     private List<Sale> onSales;
 }

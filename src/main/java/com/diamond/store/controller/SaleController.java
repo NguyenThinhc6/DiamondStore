@@ -53,7 +53,7 @@ public class SaleController {
                 .timeEnd(saleRequest.getTimeEnd())
                 .build();
 
-            saleService.create(sale);
+        saleService.create(sale);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.<Void>builder()
                 .code(HttpStatus.CREATED.value())
                 .message(ApplicationMessage.CREATE_DATA_SUCCESS)
@@ -87,6 +87,15 @@ public class SaleController {
         return ApiResponse.<Void>builder()
                 .code(HttpStatus.OK.value())
                 .message(ApplicationMessage.UPDATE_DATA_SUCCESS)
+                .build();
+    }
+
+    @PostMapping("/{id}/add-product/{productId}")
+    public ApiResponse<Void> addProduct(@PathVariable String id, @PathVariable Integer productId) {
+        saleService.addProductToSale(id, productId);
+        return ApiResponse.<Void>builder()
+                .code(HttpStatus.OK.value())
+                .message("Add product to sale success")
                 .build();
     }
 }

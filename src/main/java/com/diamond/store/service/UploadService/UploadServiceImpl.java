@@ -9,11 +9,17 @@ import com.diamond.store.util.ApplicationMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.text.Normalizer;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,25 +30,25 @@ public class UploadServiceImpl implements UploadService {
 
     @Override
     public FileResponse uploadAvatar(FileRequest fileRequest) {
-        log.info("Uploading file : {} ", fileRequest.getFile().getOriginalFilename());
 
-        try {
+        return uploadFile(fileRequest.getFile(), fileRequest.getOwnerId(), fileRequest.getTags());
 
+    }
 
-            Map<String, Object> uploadParams = new HashMap<>();
-            uploadParams.put("public_id", fileRequest.getOwnerId());
-            uploadParams.put("tags", String.join(",", fileRequest.getTags()));
+    @Override
+    public List<FileResponse> uploadProductImages(FileRequest fileRequest) {
+        List<CompletableFuture<FileResponse>> uploadFutures = fileRequest.getFiles().stream()
+                .map(file -> CompletableFuture.supplyAsync(() ->
+                                uploadFile(file, UUID.randomUUID().toString(), fileRequest.getTags()),
+                        Executors.newFixedThreadPool(fileRequest.getFiles().size())
+                ))
+                .toList();
 
-            Map uploadResult = upload(fileRequest.getFile().getBytes(), uploadParams);
-            FileResponse fileResponse = new FileResponse();
-            fileResponse.setFileId(fileRequest.getOwnerId());
-            fileResponse.setUrl(uploadResult.get("url").toString());
+        CompletableFuture.allOf(uploadFutures.toArray(new CompletableFuture[0])).join();
 
-            return fileResponse;
-        } catch (IOException e) {
-            throw new InternalServerErrorException(ApplicationMessage.UPLOAD_FAILED);
-        }
-
+        return uploadFutures.stream()
+                .map(CompletableFuture::join)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -58,21 +64,41 @@ public class UploadServiceImpl implements UploadService {
     }
 
 
+    private FileResponse uploadFile(MultipartFile file, String publicId, String[] tags) {
+
+        log.info("Uploading file : {} ", file.getOriginalFilename());
+
+        try {
+            Map<String, Object> uploadParams = new HashMap<>();
+            uploadParams.put("public_id", publicId);
+            uploadParams.put("tags", String.join(",", tags));
+
+            Map uploadResult = upload(file.getBytes(), uploadParams);
+
+            FileResponse fileResponse = new FileResponse();
+            fileResponse.setFileId(publicId);
+            fileResponse.setUrl(uploadResult.get("url").toString());
+
+            log.info("Upload result : {}", uploadResult);
+            return fileResponse;
+        } catch (IOException e) {
+            throw new InternalServerErrorException(ApplicationMessage.UPLOAD_FAILED);
+        }
+    }
+
     private Map upload(byte[] file, Map<String, Object> uploadParams) throws IOException {
         return cloudinary.uploader().upload(file, uploadParams);
     }
 
 
-/*
-
-    private  String generateUniquePublicId(String basePublicId) {
+    private String generateUniquePublicId(String basePublicId) {
         String uniqueId = basePublicId;
         int count = 1;
 
         // Lặp cho đến khi tìm được public_id chưa tồn tại
-        synchronized(this){
+        synchronized (this) {
             while (isPublicIdExists(uniqueId)) {
-                uniqueId = basePublicId + "(" + count + ")";
+                uniqueId = basePublicId + "_" + count;
                 count++;
             }
         }
@@ -80,7 +106,6 @@ public class UploadServiceImpl implements UploadService {
 
         return uniqueId;
     }
-*/
 
     private boolean isPublicIdExists(String publicId) {
         try {

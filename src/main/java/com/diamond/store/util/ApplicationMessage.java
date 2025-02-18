@@ -15,9 +15,10 @@ public class ApplicationMessage {
     public static final String UPLOAD_FAILED = "Upload file failed!";
     public static final String DELETE_FILE_FAILED = "Delete file failed!";
 
+    public static final String CART_NOTFOUND = "Cart is not found!";
+
     //Generic message
     public static final String DATA_NOTFOUND = "Data is not found!";
-
 
 
     //Response api message

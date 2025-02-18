@@ -45,7 +45,7 @@ public class ProductController {
         productService.createProduct(productRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.<Void>builder()
-                        .code(HttpStatus.CREATED.value())
+                .code(HttpStatus.CREATED.value())
                 .message(ApplicationMessage.CREATE_DATA_SUCCESS)
                 .build());
     }
@@ -67,6 +67,17 @@ public class ProductController {
         return ApiResponse.<Void>builder()
                 .code(HttpStatus.OK.value())
                 .message(ApplicationMessage.UPDATE_DATA_SUCCESS)
+                .build();
+    }
+
+
+    @PostMapping("/create-with-image")
+    public ApiResponse<Void> createProductWitImage(@ModelAttribute ProductRequest productRequest) {
+        productService.createProductWithImage(productRequest);
+
+        return ApiResponse.<Void>builder()
+                .code(HttpStatus.OK.value())
+                .message(ApplicationMessage.CREATE_DATA_SUCCESS)
                 .build();
     }
 }

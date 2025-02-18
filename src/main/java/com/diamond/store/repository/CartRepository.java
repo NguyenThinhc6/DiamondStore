@@ -1,0 +1,9 @@
+package com.diamond.store.repository;
+
+import com.diamond.store.model.Cart;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface CartRepository extends JpaRepository<Cart, Integer> {
+}
